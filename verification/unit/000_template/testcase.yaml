@@ -1,0 +1,3 @@
+tests:
+  template.test_template:
+    filter: dt_enabled_alias_with_parent_compat("led0", "gpio-leds")
