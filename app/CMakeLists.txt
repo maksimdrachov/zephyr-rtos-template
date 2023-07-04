@@ -9,7 +9,8 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_LIST_DIR}/../cmake/mo
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 project(blinky)
 
-target_sources(app PRIVATE src/main.c)
+# target_sources(app PRIVATE src/main.c)
+target_sources(app PRIVATE src/main.cpp)
 target_include_directories(app PRIVATE ${CMAKE_CURRENT_LIST_DIR}/src)
 
 # Setup Clang-Tidy
