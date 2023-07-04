@@ -48,7 +48,7 @@ twister-out*/
 # Python
 venv/
 verification/integration/__pycache__/
-verification/integration/paris/__pycache__/
+verification/integration/tests/__pycache__/
 
 # scripts
 scripts/platform-tests-results/

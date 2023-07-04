@@ -258,7 +258,7 @@ On Linux, `minicom` can be used:
 minicom -D /dev/serial/by-id/...
 ```
 
-On Window: I don't know, ask yourself: "Where did I go wrong in life?"
+Windows? I don't know man, ask yourself: "Where did I go wrong in life?"
 
 ## 3. Set up a minimal unit testing template
 
@@ -291,51 +291,6 @@ zephyr-project-template/
           main.c
         testcase.yaml
 ```
-
-- `CMakeLists.txt`:
-
-  ```cmake
-  # SPDX-License-Identifier: Apache-2.0
-
-  cmake_minimum_required(VERSION 3.20.0)
-
-  find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
-
-  project(test_template)
-
-  FILE(GLOB app_sources src/*.c src/*.h)
-  target_sources(app PRIVATE ${app_sources})
-  ```
-
-- `prj.conf`:
-
-  ```
-  CONFIG_ZTEST=y
-  CONFIG_ZTEST_NEW_API=y
-  ```
-
-- `src/main.c`:
-
-  ```cpp
-  #include <zephyr/ztest.h>
-  #include <zephyr/kernel.h>
-
-  ZTEST(template, test_template)
-  {
-      zassert_true(true, "Some test failed");
-      printk("test finished!\n");
-  }
-
-  ZTEST_SUITE(template, NULL, NULL, NULL, NULL, NULL);
-  ```
-
-- `testcase.yaml`:
-
-  ```
-  tests:
-    template.test_template:
-      filter: dt_enabled_alias_with_parent_compat("led0", "gpio-leds")
-  ```
 
 Note: for your own additional unit tests, you will create additional directories (ex: `unit/001_CAN`).
 
@@ -431,19 +386,6 @@ zephyr-project-template/
       requirements.txt
 ```
 
-Some explanation on what each file does:
-
-- `raspi_power.py`:
-- `tests/test_000_flash.py`: This file contains the actual test. It consists of 2 parts: building and flashing.
-- `noxfile.py`: This will make sure our Python environment is set up correctly.
-- `pyproject.toml`:
-- `requirements.txt`: The name is pretty self-explanatory. It's content:
-
-  ```
-  pytest-asyncio==0.21.0                   # asyncio is pretty useful for testing
-  -r ../../zephyr/scripts/requirements.txt # of course we also need the packages required by Zephyr
-  ```
-
 Now if you've done everything correctly:
 
 ```
@@ -463,13 +405,40 @@ pytest tests/test_000_flash.py --pdb
 
 If you disconnect the MCU, it should fail in the following manner:
 
-## 5. Set up Clang-Tidy to run locally during the build
+![flash-failed](images/flash-failed.png)
 
+## 5. Setting up Clang-Tidy and Clang-Format
 
+PS: Before continuing with this section, make sure to do the following changes to Zephyr: [Every include of Zephyr is a SYSTEM include.](https://github.com/maksimdrachov/zephyr/commit/956cf9450a1695e181c6d8517759b80b40f7b43f)
 
+Since we want to make sure that Clang works on both `app` code as well as `verification/unit`, we will need to add it as a shared CMake module (stored in `cmake/modules/ZephyrBuildConfig.cmake`). Update the relevant CMake files to include this module:
+- `app/CMakeLists.txt`
+- `verification/unit/000_template/CMakeLists.txt`
 
+Now every time we do `west build` it should automatically run Clang-Tidy:
 
+```
+west build -b <BOARD> ./app
+```
 
+Let's say we introduce something like this into `main.cpp`:
 
+```
+int x;
+std::cout << "The value of x is: " << x << std::endl;
+```
+
+![clang-tidy](images/clang-tidy-fail.png)
+
+QUESTION: If I remove `set_target_properties` this error still occurs, so is Clang-Tidy really the one catching this error?
+
+To run Clang-Format:
+
+```
+west build -t check_format
+west build -t format
+```
+
+![clang-format](images/clang-format.png)
 
 
