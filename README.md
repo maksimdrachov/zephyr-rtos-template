@@ -12,9 +12,9 @@ As you can see in the image above, it consists of 3 parts:
 2. *server*: any old desktop should do!
 3. *Github repo*: lives in some Microsoft server park?
 
-Now as you might notice, this setup requires you to have 2 boards instead of 1. This is not a strictly necessary: it is perfectly possible to `ssh` into the server setup while you're sipping a cocktail in the Bahamas (*"work"* from *"home"*, amirite?) and flash/debug the board in this way. The only real downside is that sometimes it might be necessary to connect some oscilloscope, measure some voltage or make some other adjustment to the setup requiring to physically interact with the server setup (*who is working on this?*).
+Now as you might notice, this setup requires you to have 2 boards instead of 1. This is not strictly necessary: it is perfectly possible to `ssh` into the server setup while you're sipping a cocktail in the Bahamas (*"work"* from *"home"*, amirite?) and flash/debug the board in this way. The only real downside is that sometimes it might be necessary to connect some oscilloscope, measure some voltage or make some other adjustment to the setup requiring to physically interact with the server setup (*who is working on this?*).
 
-Note: I'm assuming you have already set up the Zephyr toolchain, as well as have some familiarity with how it works. If this is not the case, you should probably check out Zephyr's [Getting Started Guide](https://docs.zephyrproject.org/latest/develop/getting_started/index.html) or my (possibly slightly outdated) [Zephyr for Beginners Tutorial](https://github.com/maksimdrachov/zephyr-rtos-tutorial).
+Note: I'm assuming you have already set up the Zephyr toolchain, as well as have some familiarity with how it works. If this is not the case, you should probably check out Zephyr's [Getting Started Guide](https://docs.zephyrproject.org/latest/develop/getting_started/index.html).
 
 With that preamble out of the way, let's get down to business.
 
@@ -343,7 +343,7 @@ A successful run looks like this:
 
 ![success-test](images/success-test.png)
 
-`twister-out/nucleo_l432kc/template.test_template/handler.log` contains a log of the test run:
+`zephyr-rtos-template/twister-out/twister.log` contains a log of the test run:
 
 ```
 *** Booting Zephyr OS build 49580bd374e3 ***
@@ -376,8 +376,6 @@ zephyr-project-template/
   verification/
     unit/
     integration/
-      bin/
-        raspi_power.py
       tests/
         test_000_flash.py
       noxfile.py
@@ -408,7 +406,7 @@ If you disconnect the MCU, it should fail in the following manner:
 
 ## 5. Setting up Clang-Tidy and Clang-Format
 
-PS: Before continuing with this section, make sure to do the following changes to Zephyr: [Every include of Zephyr is a SYSTEM include.](https://github.com/maksimdrachov/zephyr/commit/956cf9450a1695e181c6d8517759b80b40f7b43f)
+PS: Before continuing with this section, make sure to make the following changes to Zephyr: [Every include of Zephyr is a SYSTEM include.](https://github.com/maksimdrachov/zephyr/commit/956cf9450a1695e181c6d8517759b80b40f7b43f)
 
 Since we want to make sure that Clang works on both `app` code as well as `verification/unit`, we will need to add it as a shared CMake module (stored in `cmake/modules/ZephyrBuildConfig.cmake`). Update the relevant CMake files to include this module:
 - `app/CMakeLists.txt`
@@ -443,13 +441,6 @@ west build -t format
 ![clang-format](images/clang-format.png)
 
 ## 6. Setting up the CI
-
-- [How to install Ubuntu Server on your Raspberry Pi](https://ubuntu.com/tutorials/how-to-install-ubuntu-on-your-raspberry-pi#4-boot-ubuntu-server)
-- [Zephyr: Getting Started guide](https://docs.zephyrproject.org/latest/develop/getting_started/index.html)
-- [About self-hosted runners](https://docs.github.com/en/actions/hosting-your-own-runners/managing-self-hosted-runners/about-self-hosted-runners)
-- [Adding a self-hosted runner to a repository](https://docs.github.com/en/actions/hosting-your-own-runners/managing-self-hosted-runners/adding-self-hosted-runners#adding-a-self-hosted-runner-to-a-repository)
-- Setup repo
--
 
 The final step is setting up the self-hosted runner for the CI:
 
@@ -523,7 +514,11 @@ jobs:
 
 ## Conclusion
 
-[moderndev.pl](https://moderndev.pl/posts/zephyr-rtos-tutorial/001-devcontainers.html)
+Now you should be able develop your Zephyr application while having a decent CI to catch any errors/mistakes.
 
-[Devops for Embedded](https://www.stupid-projects.com/posts/devops-for-embedded-part-1/)
+Other interesting blogs on this topic:
+
+[moderndev.pl/posts/zephyr-rtos-tutorial](https://moderndev.pl/posts/zephyr-rtos-tutorial/001-devcontainers.html)
+
+[stupid-projects.com/posts/devops-for-embedded](https://www.stupid-projects.com/posts/devops-for-embedded-part-1/)
 
