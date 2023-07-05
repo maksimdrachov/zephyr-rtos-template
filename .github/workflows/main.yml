@@ -1,0 +1,37 @@
+name: CI pipeline - build
+
+on:
+  - push
+  #- pull_request # disabled due to security consideration (but useful to enable): https://docs.github.com/en/actions/hosting-your-own-runners/managing-self-hosted-runners/about-self-hosted-runners#self-hosted-runner-security
+
+jobs:
+  build:
+    runs-on: [self-hosted, framboos] # framboos = raspberry in dutch, framboos is our self-hosted runner RPI
+    if: contains(github.ref, '/main')
+    steps:
+      - uses: actions/checkout@v3
+        # with:
+          # Private submodule access requires token
+          # token: ${{ secrets.ACCESS_TOKEN_FOR_GITHUB }}
+          # ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Setup
+        run: |
+          ./scripts/setup.sh
+      - name: Build
+        run: |
+          . venv/bin/activate
+          west build -b nucleo_l432kc ./app
+      - name: Check Clang-Format
+        run: |
+          west build -t check_format
+      - name: Flash app
+        run: |
+          west flash
+      - name: Run unit tests
+        run: |
+          ./scripts/run_unit_tests.sh
+      - name: Run integration tests
+        run: |
+          cd ./verification/integration
+          nox --session test
+          cd ../..
