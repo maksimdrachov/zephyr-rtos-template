@@ -431,6 +431,8 @@ std::cout << "The value of x is: " << x << std::endl;
 
 QUESTION: If I remove `set_target_properties` this error still occurs, so is Clang-Tidy really the one catching this error?
 
+Setting up Clang-Format is done in a very similar way (see the CMakeLists files mentioned above).
+
 To run Clang-Format:
 
 ```
@@ -440,10 +442,88 @@ west build -t format
 
 ![clang-format](images/clang-format.png)
 
-## 6. Setting up server
+## 6. Setting up the CI
+
+- [How to install Ubuntu Server on your Raspberry Pi](https://ubuntu.com/tutorials/how-to-install-ubuntu-on-your-raspberry-pi#4-boot-ubuntu-server)
+- [Zephyr: Getting Started guide](https://docs.zephyrproject.org/latest/develop/getting_started/index.html)
+- [About self-hosted runners](https://docs.github.com/en/actions/hosting-your-own-runners/managing-self-hosted-runners/about-self-hosted-runners)
+- [Adding a self-hosted runner to a repository](https://docs.github.com/en/actions/hosting-your-own-runners/managing-self-hosted-runners/adding-self-hosted-runners#adding-a-self-hosted-runner-to-a-repository)
+- Setup repo
+-
+
+The final step is setting up the self-hosted runner for the CI:
+
+![setup-rpi](images/setup-rpi.png)
+
+As you can see, I'm using a Raspberry Pi (400), the instructions on how to set up (make sure to select Ubuntu Server **64 bit**):
+
+- [How to install Ubuntu Server on your Raspberry Pi](https://ubuntu.com/tutorials/how-to-install-ubuntu-on-your-raspberry-pi#4-boot-ubuntu-server)
+
+Next, you'll want to install the Zephyr SDK and verify that you are able to flash a simple blinky:
+
+- [Zephyr: Getting Started guide](https://docs.zephyrproject.org/latest/develop/getting_started/index.html)
+
+Then you'll need to setup a self-hosted runner, Github provides clear documentation on how to do this:
+
+- [About self-hosted runners](https://docs.github.com/en/actions/hosting-your-own-runners/managing-self-hosted-runners/about-self-hosted-runners)
+- [Adding a self-hosted runner to a repository](https://docs.github.com/en/actions/hosting-your-own-runners/managing-self-hosted-runners/adding-self-hosted-runners#adding-a-self-hosted-runner-to-a-repository)
+
+Once you have done these steps, you can start with setting up your repo to make use of this self-hosted runner.
+
+Create a new folder called .github, which will contain the steps/actions executed by the local runner:
+
+```
+.github/
+  workflows/
+    main.yml
+```
+
+In `main.yml`:
+
+```yml
+name: CI pipeline - build
+
+on:
+  - push
+  #- pull_request # disabled due to security consideration (but useful to enable): https://docs.github.com/en/actions/hosting-your-own-runners/managing-self-hosted-runners/about-self-hosted-runners#self-hosted-runner-security
+
+jobs:
+  build:
+    runs-on: [self-hosted, framboos] # framboos = raspberry in dutch, framboos is our self-hosted runner RPI
+    if: contains(github.ref, '/main')
+    steps:
+      - uses: actions/checkout@v3
+        # with:
+          # Private submodule access requires token
+          # token: ${{ secrets.ACCESS_TOKEN_FOR_GITHUB }}
+          # ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Setup
+        run: |
+          ./scripts/setup.sh
+      - name: Build
+        run: |
+          . venv/bin/activate
+          west build -b nucleo_l432kc ./app
+      - name: Check Clang-Format
+        run: |
+          west build -t check_format
+      - name: Flash app
+        run: |
+          west flash
+      - name: Run unit tests
+        run: |
+          ./scripts/run_unit_tests.sh
+      - name: Run integration tests
+        run: |
+          cd ./verification/integration
+          nox --session test
+          cd ../..
+```
+
 
 ## Conclusion
 
 [moderndev.pl](https://moderndev.pl/posts/zephyr-rtos-tutorial/001-devcontainers.html)
+
 [Devops for Embedded](https://www.stupid-projects.com/posts/devops-for-embedded-part-1/)
 
