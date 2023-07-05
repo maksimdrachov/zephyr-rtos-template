@@ -1,4 +1,4 @@
-# Zephyr RTOS DevOps
+# Devops for a Zephyr RTOS project
 
 ## Introduction
 
@@ -12,11 +12,11 @@ As you can see in the image above, it consists of 3 parts:
 2. *server*: any old desktop should do!
 3. *Github repo*: lives in some Microsoft server park?
 
-Now as you might notice, this setup requires you to have 2 boards instead of 1. This is not a *strict* requirement: it is perfectly possible to `ssh` into the server setup while you're sipping a cocktail in the Bahamas (*"work"* from *"home"*, amirite?) and flash/debug the board in this way. The only real downside is that sometimes it might be necessary to connect some oscilloscope, measure some voltage or make some other adjustment to the setup requiring to physically interact with the server setup (who is working on this?).
+Now as you might notice, this setup requires you to have 2 boards instead of 1. This is not a strictly necessary: it is perfectly possible to `ssh` into the server setup while you're sipping a cocktail in the Bahamas (*"work"* from *"home"*, amirite?) and flash/debug the board in this way. The only real downside is that sometimes it might be necessary to connect some oscilloscope, measure some voltage or make some other adjustment to the setup requiring to physically interact with the server setup (*who is working on this?*).
 
 Note: I'm assuming you have already set up the Zephyr toolchain, as well as have some familiarity with how it works. If this is not the case, you should probably check out Zephyr's [Getting Started Guide](https://docs.zephyrproject.org/latest/develop/getting_started/index.html) or my (possibly slightly outdated) [Zephyr for Beginners Tutorial](https://github.com/maksimdrachov/zephyr-rtos-tutorial).
 
-Ok, with that preamble out of the way, let's get down to business.
+With that preamble out of the way, let's get down to business.
 
 ## 1. Set up the repository
 
@@ -40,7 +40,7 @@ As discussed in [Application Development](https://docs.zephyrproject.org/latest/
 
     The application is located outside a Zephyr workspace.
 
-We will be using the second approach.
+We will be using the second approach:
 
 ```
 cd ~
@@ -160,8 +160,7 @@ verification/integration/.coverage
 ```
 </details>
 
-
-If you've done everything right, `git status` should give the following:
+If you've done everything right, `git status` should return the following:
 
 ```
 $ git status
@@ -258,7 +257,7 @@ On Linux, `minicom` can be used:
 minicom -D /dev/serial/by-id/...
 ```
 
-Windows? I don't know man, ask yourself: "Where did I go wrong in life?"
+Windows? I don't know man, I feel sorry for you.
 
 ## 3. Set up a minimal unit testing template
 
@@ -368,7 +367,7 @@ PROJECT EXECUTION SUCCESSFUL
 
 Now on to the second part of verification: integration tests.
 
-As previously explained verification takes place at a higher level of abstraction, and assumes that we are interacting with our MCU from the outside (using our local/server). For this purpose we'll be using the PyTest framework.
+As previously explained verification takes place at a higher level of abstraction, and assumes that we are interacting with our MCU from the outside (using our local/server). To help us with this, we will be using the PyTest framework.
 
 Start by adding a `integration` folder to your directory (copy the files from the [repo](https://github.com/maksimdrachov/zephyr-rtos-template)):
 
@@ -441,4 +440,10 @@ west build -t format
 
 ![clang-format](images/clang-format.png)
 
+## 6. Setting up server
+
+## Conclusion
+
+[moderndev.pl](https://moderndev.pl/posts/zephyr-rtos-tutorial/001-devcontainers.html)
+[Devops for Embedded](https://www.stupid-projects.com/posts/devops-for-embedded-part-1/)
 

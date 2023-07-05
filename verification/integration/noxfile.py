@@ -10,9 +10,7 @@ import nox
 # REQUIRED_COVERAGE_PCT = 80
 
 ROOT_DIR = Path(__file__).resolve().parent
-SRC_DIR = ROOT_DIR / "paris"
-BIN_DIR = ROOT_DIR / "bin"
-assert BIN_DIR.is_dir()
+SRC_DIR = ROOT_DIR / "tests"
 VERIFICATION_ROOT = ROOT_DIR.parent
 PROJECT_ROOT = VERIFICATION_ROOT.parent
 
@@ -42,7 +40,7 @@ def test(session):
     session.install("-r", "requirements.txt")
 
     pytest_env = {
-        "PATH": os.pathsep.join([session.env["PATH"], str(BIN_DIR)]),
+        "PATH": session.env["PATH"],
     }
     session.log(f"Environment: {pytest_env}")
     session.run("coverage", "run", "-m", "pytest", *session.posargs, env=pytest_env)
