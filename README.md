@@ -506,6 +506,7 @@ jobs:
           ./scripts/run_unit_tests.sh
       - name: Run integration tests
         run: |
+          . venv/bin/activate
           cd ./verification/integration
           nox --session test
           cd ../..
