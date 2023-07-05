@@ -15,6 +15,9 @@ test_paths=(
 # save workspace path
 workspace_path=$(pwd)
 
+# Activate Python virtual environment
+. venv/bin/activate || die "Failed to activate Python virtual environment"
+
 # Build and execute each unit test
 for path in "${test_paths[@]}"
 do
