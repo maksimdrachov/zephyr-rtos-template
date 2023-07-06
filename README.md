@@ -143,17 +143,16 @@ twister-out*/
 
 # Python
 venv/
-verification/integration/__pycache__/
-verification/integration/paris/__pycache__/
+__pycache__/
 
 # scripts
 scripts/platform-tests-results/
 *.bin
 
 # nox
-verification/integration/.nox/
-verification/integration/.pytest_cache/
-verification/integration/.coverage
+.nox/
+.pytest_cache/
+.coverage*
 
 # SonarCloud
 .scannerwork/
@@ -251,13 +250,14 @@ On my local setup (macOS) I use [CoolTerm](https://freeware.the-meiers.org/) (se
 
 ![logging](images/west-log.png)
 
-On Linux, `minicom` can be used:
+On GNU/Linux, `picocom` or `minicom` can be used:
 
 ```
+picocom /dev/serial/by-id/...
 minicom -D /dev/serial/by-id/...
 ```
 
-Windows? I don't know man, I feel sorry for you.
+Windows? I don't know man, I feel sorry for you (maybe try PuTTY).
 
 ## 3. Set up a minimal unit testing template
 
@@ -270,12 +270,12 @@ To save myself some time, I will quote the CEO/CTO directly here:
 
 > The software verfication will be performed using the following utilities:
 >
-> - **Unit testing suites for each component of the software.** These are arranged as dedicated executable build targets, where each target executes on the target hardware with the in-circuit debugger connected. Upon execution, the unit testing suite will run the collection of unit tests and report the outcome to the host computer via the serial interface.
+> - **Unit testing suites for each component of the software.** These are arranged as dedicated executable build targets, where each target executes on the target hardware with the in-circuit debugger connected. Upon execution, the unit testing suite will run the collection of unit tests and report the outcome to the host computer via the ~~semihosting~~ serial interface.
 > - **Integration test suite for the production software.** This component will be implemented as a script that runs on the well-instrumented host computer with the product running the production software connected to said computer via the regular communication interfaces expected to be leveraged in the final application (e.g., CAN bus, RCPWM, etc.). The script will excite the device and verify that the response matches the expectations set forth by the datasheet and other documentation. The integration test suite should be based on PyTest.
 
 I couldn't have said it better myself (or more complicated), thanks [Pavel](https://twitter.com/PavelKirienko).
 
-Btw, if you're wondering what the difference is between unit and verification tests: unit tests are for testing the code base (ex: making sure the functions return the correct output receiving a given input); verification tests take place at a higher level of abstraction: we flash the MCU with our `app` code and then give it some input (from the outside) and measure the output (ex: our server sends a CAN message, which should result in some pin being set high).
+Btw, if you're wondering what the difference is between unit and integration tests: unit tests are for testing the code base (ex: making sure the functions return the correct output receiving a given input); integration tests take place at a higher level of abstraction: we flash the MCU with our `app` code and then give it some input (from the outside) and measure the output (ex: our server sends a CAN message, which should result in some pin being set high).
 
 Start by adding a `verification` folder to your directory:
 
@@ -367,7 +367,7 @@ PROJECT EXECUTION SUCCESSFUL
 
 Now on to the second part of verification: integration tests.
 
-As previously explained verification takes place at a higher level of abstraction, and assumes that we are interacting with our MCU from the outside (using our local/server). To help us with this, we will be using the PyTest framework.
+As previously explained verification takes place at a higher level of abstraction, and assumes that we are interacting with our MCU from the outside (using our local computer/server). To help us with this, we will be using the PyTest framework.
 
 Start by adding a `integration` folder to your directory (copy the files from the [repo](https://github.com/maksimdrachov/zephyr-rtos-template)):
 
@@ -428,6 +428,7 @@ std::cout << "The value of x is: " << x << std::endl;
 ![clang-tidy](images/clang-tidy-fail.png)
 
 QUESTION: If I remove `set_target_properties` this error still occurs, so is Clang-Tidy really the one catching this error?
+ANSWER: NO.
 
 Setting up Clang-Format is done in a very similar way (see the CMakeLists files mentioned above).
 
