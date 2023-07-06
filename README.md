@@ -1,5 +1,8 @@
 # Devops for a Zephyr RTOS project
 
+> **Note**
+> If you have questions/remarks, bring them to the [forum](https://forum.zubax.com/t/devops-for-zephyr-rtos/2118).
+
 ## Introduction
 
 Before digging into the details, this is a high-level overview of our CI setup:
