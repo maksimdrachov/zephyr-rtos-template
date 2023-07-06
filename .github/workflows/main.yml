@@ -27,7 +27,7 @@ jobs:
           west build -t check_format
       - name: Flash app
         run: |
-        . venv/bin/activate
+          . venv/bin/activate
           west flash
       - name: Run unit tests
         run: |
