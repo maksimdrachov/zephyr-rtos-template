@@ -23,9 +23,11 @@ jobs:
           west build -b nucleo_l432kc ./app
       - name: Check Clang-Format
         run: |
+          . venv/bin/activate
           west build -t check_format
       - name: Flash app
         run: |
+        . venv/bin/activate
           west flash
       - name: Run unit tests
         run: |
