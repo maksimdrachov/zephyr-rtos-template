@@ -418,18 +418,6 @@ Now every time we do `west build` it should automatically run Clang-Tidy:
 west build -b <BOARD> ./app
 ```
 
-Let's say we introduce something like this into `main.cpp`:
-
-```
-int x;
-std::cout << "The value of x is: " << x << std::endl;
-```
-
-![clang-tidy](images/clang-tidy-fail.png)
-
-QUESTION: If I remove `set_target_properties` this error still occurs, so is Clang-Tidy really the one catching this error?
-ANSWER: NO.
-
 Setting up Clang-Format is done in a very similar way (see the CMakeLists files mentioned above).
 
 To run Clang-Format:
